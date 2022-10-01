@@ -1,6 +1,6 @@
 # Translate Web Pages
 
-## Translate your page in real time using Google or Yandex
+## Translate your page in real time using Google, Yandex or Replica
 
 
 ### How to install the extension in Firefox

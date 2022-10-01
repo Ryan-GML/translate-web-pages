@@ -230,9 +230,12 @@ const translationService = {};
         return await bingGetSidPromise
     }
 
+
+
     const googleTranslationInProgress = {}
     const yandexTranslationInProgress = {}
     const bingTranslationInProgress = {}
+    const replicaTranslationInProgress = {}
 
     function getTranslationInProgress(translationService, targetLanguage) {
         let translationInProgress
@@ -240,6 +243,8 @@ const translationService = {};
             translationInProgress = yandexTranslationInProgress
         } else if (translationInProgress === "bing") {
             translationInProgress = bingTranslationInProgress
+        } else if (translationInProgress === "replica") {
+            translationInProgress = replicaTranslationInProgress
         } else {
             translationInProgress = googleTranslationInProgress
         }
@@ -255,6 +260,7 @@ const translationService = {};
     translationService.yandex = {}
     translationService.bing = {}
     translationService.deepl = {}
+    translationService.replica = {}
 
     async function translateHTML(translationService, targetLanguage, translationServiceURL, sourceArray, requestBody, textParamName, translationProgress, dontSaveInCache = false) {
         const thisTranslationProgress = []
@@ -326,8 +332,12 @@ const translationService = {};
                     http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
                     http.responseType = "json"
                     http.send(`&fromLang=auto-detect${request.requestBody}&to=${targetLanguage}${bingTranslateSID}`)
+                } else if (translationService === "replica") {
+                    http.open("POST", "https://butler.local/butler/api/translation/" )
+                    http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+                    http.responseType = "json"
+                    http.send(`&envId=abcdefg&translateFrom=auto${request.requestBody}&translateTo=${targetLanguage}`)
                 }
-
                 http.onload = e => {
                     try {
                         const response = http.response
@@ -342,7 +352,15 @@ const translationService = {};
                             }
                         } else if (translationService === "bing") {
                             responseJson = [http.response[0].translations[0].text]
+                        } else if (translationService === "replica") {
+                            if (response.translated){
+                                responseJson = [response.translated];
+                            }
+                            else{ 
+                                responseJson = response;
+                            }
                         }
+
 
                         request.transInfos.forEach((transInfo, index) => {
                             try {
@@ -675,6 +693,50 @@ const translationService = {};
             .then(thisTranslationProgress => thisTranslationProgress[0].translated)
     }
     
+    translationService.replica.translateHTML = async (sourceArray3d, targetLanguage, dontSaveInCache = false) => {
+
+        if (targetLanguage.indexOf("zh-") !== -1) {
+            targetLanguage = "zh"
+        }
+        const sourceArray = sourceArray3d.map(sourceArray =>
+            sourceArray.map(value => escapeHTML(value)).join("<wbr>"))
+
+        const requestBody = "format=html&lang=" + targetLanguage
+
+        return await translateHTML(
+                "replica",
+                targetLanguage,
+                "https://butler.local/translate/",
+                sourceArray,
+                "",
+                "data",
+                getTranslationInProgress("replica", targetLanguage),
+                dontSaveInCache
+            )
+            .then(thisTranslationProgress => {
+                const results = thisTranslationProgress.map(value => value.translated)
+
+                const resultArray3d = []
+                for (const result of results) {
+                    resultArray3d.push(
+                        result
+                        .split("<wbr>")
+                        .map(value => unescapeHTML(value))
+                    )
+                }
+
+                return resultArray3d
+            })
+    }
+    
+    translationService.replica.translateText = async (sourceArray, targetLanguage, dontSaveInCache = false) => {
+        return (await translationService.replica.translateHTML(sourceArray.map(value => [value]), targetLanguage, dontSaveInCache)).map(value => value[0])
+    }
+    
+    translationService.replica.translateSingleText = (source, targetLanguage, dontSaveInCache = false) => translationService.replica.translateText([ source ], targetLanguage, dontSaveInCache).then(results => results[0])
+
+
+
     let DeepLTab = null;
     translationService.deepl.translateSingleText = (source, targetlanguage, dontSaveInCache = false) => {
         //*
@@ -782,6 +844,9 @@ const translationService = {};
             let translateHTML
             if (request.translationService === "yandex") {
                 translateHTML = translationService.yandex.translateHTML
+            }
+            else if (request.translationService === "replica") {
+                translateHTML = translationService.replica.translateHTML
             } else {
                 translateHTML = translationService.google.translateHTML
             }
@@ -795,6 +860,9 @@ const translationService = {};
             let translateText
             if (request.translationService === "yandex") {
                 translateText = translationService.yandex.translateText
+            }
+            if (request.translationService === "replica") {
+                translateText = translationService.replica.translateText
             } else {
                 translateText = translationService.google.translateText
             }
@@ -812,6 +880,8 @@ const translationService = {};
                 translateSingleText = translationService.yandex.translateSingleText
             } else if (request.translationService === "bing") {
                 translateSingleText = translationService.bing.translateSingleText
+            } else if (request.translationService === "replica") {
+                translateSingleText = translationService.replica.translateSingleText
             } else {
                 translateSingleText = translationService.google.translateSingleText
             }

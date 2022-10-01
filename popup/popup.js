@@ -157,7 +157,12 @@ twpConfig.onReady(function () {
         if (currentPageTranslatorService == "yandex") {
             $("#btnOptions option[value='translateInExternalSite']").textContent = chrome.i18n.getMessage("msgOpenOnYandexTranslator")
             $("#iconTranslate").setAttribute("src", "/icons/yandex-translate-32.png")
-        } else { // google
+        }
+        else if (currentPageTranslatorService == "replica") {
+            $("#btnOptions option[value='translateInExternalSite']").textContent = chrome.i18n.getMessage("msgOpenOnReplicaTranslator")
+            $("#iconTranslate").setAttribute("src", "/icons/replica-32.png")
+        }
+        else { // google
             $("#btnOptions option[value='translateInExternalSite']").textContent = chrome.i18n.getMessage("btnOpenOnGoogleTranslate")
             $("#iconTranslate").setAttribute("src", "/icons/google-translate-32.png")
         }
@@ -292,7 +297,11 @@ twpConfig.onReady(function () {
 
         if (currentPageTranslatorService === "google") {
             currentPageTranslatorService = "yandex"
-        } else {
+        } 
+        else if (currentPageTranslatorService === "yandex") {
+            currentPageTranslatorService = "replica"
+        }
+        else {
             currentPageTranslatorService = "google"
         }
 
@@ -472,7 +481,13 @@ twpConfig.onReady(function () {
                             chrome.tabs.create({
                                 url: "https://translate.yandex.com/translate?url=" + encodeURIComponent(tabs[0].url)
                             })
-                        } else { // google
+                        } 
+                        else if (currentPageTranslatorService === "replica") {
+                            chrome.tabs.create({
+                                url: "about:blank"
+                            })
+                        } 
+                        else { // google
                             chrome.tabs.create({
                                 url: `https://translate.google.${
                                 "zh-cn" == navigator.language.toLowerCase() ? "cn" : "com"
@@ -484,11 +499,6 @@ twpConfig.onReady(function () {
                 case "moreOptions":
                     chrome.tabs.create({
                         url: chrome.runtime.getURL("/options/options.html")
-                    })
-                    break
-                case "donate":
-                    chrome.tabs.create({
-                        url: chrome.runtime.getURL("/options/options.html#donation")
                     })
                     break
                 default:
@@ -517,7 +527,7 @@ twpConfig.onReady(function () {
             $("option[data-i18n=btnAlwaysTranslate]").textContent = "✔ " + textAlways
         }
 
-        $('option[data-i18n=btnDonate]').innerHTML += " &#10084;"
+
     })
 
     $("#btnCloseHelpSwapInterface").onclick = e => {

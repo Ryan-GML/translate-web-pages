@@ -668,7 +668,11 @@ Promise.all([twpConfig.onReady(), getTabHostName()])
     pageTranslator.swapTranslationService = function () {
         if (currentPageTranslatorService === "google") {
             currentPageTranslatorService = "yandex"
-        } else {
+        }
+        else if (currentPageTranslatorService === "yandex") {
+            currentPageTranslatorService = "replica"
+        }
+         else {
             currentPageTranslatorService = "google"
         }
         if (pageLanguageState === "translated") {

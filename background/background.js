@@ -54,10 +54,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         chrome.tabs.create({
             url: chrome.runtime.getURL("/options/options.html")
         })
-    } else if (request.action === "openDonationPage") {
-        chrome.tabs.create({
-            url: chrome.runtime.getURL("/options/options.html#donation")
-        })
     } else if (request.action === "detectTabLanguage") {
         try {
             chrome.tabs.detectLanguage(sender.tab.id, result => sendResponse(result))
@@ -550,6 +546,9 @@ if (typeof chrome.commands !== "undefined") {
             let currentPageTranslatorService = twpConfig.get("pageTranslatorService")
             if (currentPageTranslatorService === "google") {
                 currentPageTranslatorService = "yandex"
+            } 
+            if (currentPageTranslatorService === "yandex") {
+                currentPageTranslatorService = "replica"
             } else {
                 currentPageTranslatorService = "google"
             }

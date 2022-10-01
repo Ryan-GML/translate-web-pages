@@ -24,7 +24,7 @@ twpConfig.onReady(function () {
 
     function hashchange() {
         const hash = location.hash || "#languages"
-        const divs = [$("#languages"), $("#sites"), $("#translations"), $("#style"), $("#hotkeys"), $("#storage"), $("#others"), $("#donation"), $("#release_notes")]
+        const divs = [$("#languages"), $("#sites"), $("#translations"), $("#style"), $("#hotkeys"), $("#storage"), $("#others"), $("#release_notes")]
         divs.forEach(element => {
             element.style.display = "none"
         })
@@ -37,9 +37,7 @@ twpConfig.onReady(function () {
         $('a[href="' + hash + '"]').classList.add("w3-light-grey")
 
         let text
-        if (hash === "#donation") {
-            text = chrome.i18n.getMessage("lblMakeDonation")
-        } else if (hash === "#release_notes") {
+        if (hash === "#release_notes") {
             text = chrome.i18n.getMessage("lblReleaseNotes")
         } else {
             text = chrome.i18n.getMessage("lblSettings")
@@ -101,14 +99,6 @@ twpConfig.onReady(function () {
                 scrollbar-color: #202324 #454a4d;
             }
 
-            #donation * {
-                background-color: #87CEEB !important;
-            }
-
-            #donation select {
-                color: black !important;
-                background-color: rgb(231, 230, 228) !important;
-            }
 
             html *, nav, #header {
                 color: rgb(231, 230, 228) !important;
@@ -881,23 +871,6 @@ twpConfig.onReady(function () {
         })
     }
 
-    if (navigator.language === "pt-BR") {
-        $("#currency").value = "BRL"
-        $("#donateInUSD").style.display = "none"
-    } else {
-        $("#currency").value = "USD"
-        $("#donateInBRL").style.display = "none"
-    }
-
-    $("#currency").onchange = e => {
-        if (e.target.value === "BRL") {
-            $("#donateInUSD").style.display = "none"
-            $("#donateInBRL").style.display = "block"
-        } else {
-            $("#donateInUSD").style.display = "block"
-            $("#donateInBRL").style.display = "none"
-        }
-    }
 })
 
 window.scrollTo({

@@ -7,6 +7,7 @@ const translationCache = {};
 translationCache.google = {}
 translationCache.yandex = {}
 translationCache.bing = {}
+translationCache.replica = {}
 
 {
 	function getTableSize(db, dbName) {
@@ -82,11 +83,13 @@ translationCache.bing = {}
 	cache.google = {}
 	cache.yandex = {}
 	cache.bing = {}
+	cache.replica = {}
 	
 	const db = {}
 	db.google = null
 	db.yandex = null
 	db.bing = null
+	db.replica = null
 	
 	function getCache(translationService) {
 		switch (translationService) {
@@ -96,6 +99,9 @@ translationCache.bing = {}
 				return cache.bing
 			case "google":
 				return cache.google
+			case "replica":
+				return cache.replica
+
 		}
 	}
 	
@@ -106,7 +112,9 @@ translationCache.bing = {}
 			case "bing":
 				return db.bing
 			case "google":
-				return db.google
+				return db.google	
+			case "replica":
+				return db.replica
 		}
 	}
 	
@@ -120,6 +128,9 @@ translationCache.bing = {}
 				break
 			case "bingCache":
 				db.bing = db_
+				break;
+			case "replicaCache":
+				db.replica = db_
 				break;
 		}
 	}
@@ -176,7 +187,7 @@ translationCache.bing = {}
 			}
 			
 			const objectStore = db.transaction([ objectName ], "readwrite").objectStore(objectName)
-			const request = objectStore.add(data)
+			const request = objectStore.put(data)
 			
 			request.onerror = event => {
 				console.error(event)
@@ -220,6 +231,8 @@ translationCache.bing = {}
 	translationCache.yandex.get = (source, targetLanguage) => translationCache.get("yandex", source, targetLanguage)
 	
 	translationCache.bing.get = (source, targetLanguage) => translationCache.get("bing", source, targetLanguage)
+
+	translationCache.replica.get = (source, targetLanguage) => translationCache.get("replica", source, targetLanguage)
 	
 	translationCache.set = async (translationService, source, translated, targetLanguage) => {
 		const cache = getCache(translationService)
@@ -255,11 +268,14 @@ translationCache.bing = {}
 	translationCache.yandex.set = (source, translated, targetLanguage) => translationCache.set("yandex", source, translated, targetLanguage)
 	
 	translationCache.bing.set = (source, translated, targetLanguage) => translationCache.set("bing", source, translated, targetLanguage)
-	
+
+	translationCache.replica.set = (source, translated, targetLanguage) => translationCache.set("replica", source, translated, targetLanguage)
+
 	openIndexeddb("googleCache", 1)
 	openIndexeddb("yandexCache", 1)
 	openIndexeddb("bingCache", 1)
-	
+	openIndexeddb("replicaCache", 1)
+
 	
 	function deleteDatabase(name) {
 		return new Promise(resolve => {
@@ -290,11 +306,16 @@ translationCache.bing = {}
 			db.bing.close();
 			db.bing = null
 		}
+		if (db.replica) {
+			db.replica.close();
+			db.replica = null
+		}
 		
 		Promise.all([
 			deleteDatabase("googleCache"),
 			deleteDatabase("yandexCache"),
-			deleteDatabase("bingCache")
+			deleteDatabase("bingCache"),
+			deleteDatabase("replicaCache")
 		]).finally(() => {
 			if (reload) {
 				chrome.runtime.reload()
@@ -302,6 +323,7 @@ translationCache.bing = {}
 				openIndexeddb("googleCache", 1)
 				openIndexeddb("yandexCache", 1)
 				openIndexeddb("bingCache", 1)
+				openIndexeddb("replicaCache", 1)
 			}
 		})
 	}
@@ -311,7 +333,7 @@ translationCache.bing = {}
 	chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		if (request.action === "getCacheSize") {
 			if (!promiseCalculatingStorage) {
-				promiseCalculatingStorage = Promise.all([ getDatabaseSize("googleCache"), getDatabaseSize("yandexCache"), getDatabaseSize("bingCache") ])
+				promiseCalculatingStorage = Promise.all([ getDatabaseSize("googleCache"), getDatabaseSize("yandexCache"), getDatabaseSize("bingCache"), getDatabaseSize("replicaCache") ])
 			}
 			
 			promiseCalculatingStorage.then(results => {

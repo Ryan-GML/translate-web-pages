@@ -160,6 +160,7 @@ Promise.all([ twpConfig.onReady(), getTabHostName() ]).then(function (_) {
 					<li title="Google" id="sGoogle">g</li>
 					<li title="Yandex" id="sYandex">y</li>
 					<li title="Bing" id="sBing">b</li>
+					<li title="Replica" id="sReplica">r</li>
 					<li title="DeepL" id="sDeepL" hidden>d</li>
 				</ul>
 				<ul>
@@ -296,6 +297,7 @@ Promise.all([ twpConfig.onReady(), getTabHostName() ]).then(function (_) {
 		const sYandex = shadowRoot.getElementById("sYandex")
 		const sBing = shadowRoot.getElementById("sBing")
 		const sDeepL = shadowRoot.getElementById("sDeepL")
+		const sReplica = shadowRoot.getElementById("sReplica")
 		const eCopy = shadowRoot.getElementById("copy")
 		const eListen = shadowRoot.getElementById("listen")
 		
@@ -342,6 +344,7 @@ Promise.all([ twpConfig.onReady(), getTabHostName() ]).then(function (_) {
 			sYandex.classList.remove("selected")
 			sBing.classList.remove("selected")
 			sDeepL.classList.remove("selected")
+			sReplica.classList.remove("selected")
 			
 			sGoogle.classList.add("selected")
 		}
@@ -354,6 +357,7 @@ Promise.all([ twpConfig.onReady(), getTabHostName() ]).then(function (_) {
 			sYandex.classList.remove("selected")
 			sBing.classList.remove("selected")
 			sDeepL.classList.remove("selected")
+			sReplica.classList.remove("selected")
 			
 			sYandex.classList.add("selected")
 		}
@@ -366,8 +370,22 @@ Promise.all([ twpConfig.onReady(), getTabHostName() ]).then(function (_) {
 			sYandex.classList.remove("selected")
 			sBing.classList.remove("selected")
 			sDeepL.classList.remove("selected")
+			sReplica.classList.remove("selected")
 			
 			sBing.classList.add("selected")
+		}
+		sReplica.onclick = () => {
+			currentTextTranslatorService = "replica"
+			twpConfig.set("textTranslatorService", "replica")
+			translateNewInput()
+			
+			sGoogle.classList.remove("selected")
+			sYandex.classList.remove("selected")
+			sBing.classList.remove("selected")
+			sDeepL.classList.remove("selected")
+			sReplica.classList.remove("selected")
+
+			sReplica.classList.add("selected")
 		}
 		sDeepL.onclick = () => {
 			currentTextTranslatorService = "deepl"
@@ -378,6 +396,7 @@ Promise.all([ twpConfig.onReady(), getTabHostName() ]).then(function (_) {
 			sYandex.classList.remove("selected")
 			sBing.classList.remove("selected")
 			sDeepL.classList.remove("selected")
+			sReplica.classList.remove("selected")
 			
 			sDeepL.classList.add("selected")
 		}
@@ -476,6 +495,8 @@ Promise.all([ twpConfig.onReady(), getTabHostName() ]).then(function (_) {
 			sDeepL.classList.add("selected")
 		} else if (currentTextTranslatorService == "bing") {
 			sBing.classList.add("selected")
+		} else if (currentTextTranslatorService == "replica") {
+			sReplica.classList.add("selected")
 		} else {
 			sGoogle.classList.add("selected")
 		}

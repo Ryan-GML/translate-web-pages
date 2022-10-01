@@ -87,6 +87,7 @@ twpConfig.onReady(function () {
 
     const sGoogle = document.getElementById("sGoogle")
     const sYandex = document.getElementById("sYandex")
+    const sReplica = document.getElementById("sReplica")
     const sBing = document.getElementById("sBing")
     const sDeepL = document.getElementById("sDeepL")
     const eCopy = document.getElementById("copy")
@@ -127,6 +128,7 @@ twpConfig.onReady(function () {
         sYandex.classList.remove("selected")
         sBing.classList.remove("selected")
         sDeepL.classList.remove("selected")
+        sReplica.classList.remove("selected")
 
         sGoogle.classList.add("selected")
     }
@@ -139,6 +141,7 @@ twpConfig.onReady(function () {
         sYandex.classList.remove("selected")
         sBing.classList.remove("selected")
         sDeepL.classList.remove("selected")
+        sReplica.classList.remove("selected")
 
         sYandex.classList.add("selected")
     }
@@ -151,8 +154,22 @@ twpConfig.onReady(function () {
         sYandex.classList.remove("selected")
         sBing.classList.remove("selected")
         sDeepL.classList.remove("selected")
+        sReplica.classList.remove("selected")
 
         sBing.classList.add("selected")
+    }
+    sReplica.onclick = () => {
+        currentTextTranslatorService = "replica"
+        twpConfig.set("textTranslatorService", "replica")
+        translateText()
+
+        sGoogle.classList.remove("selected")
+        sYandex.classList.remove("selected")
+        sBing.classList.remove("selected")
+        sDeepL.classList.remove("selected")
+        sReplica.classList.remove("selected")
+
+        sReplica.classList.add("selected")
     }
     sDeepL.onclick = () => {
         currentTextTranslatorService = "deepl"
@@ -163,6 +180,7 @@ twpConfig.onReady(function () {
         sYandex.classList.remove("selected")
         sBing.classList.remove("selected")
         sDeepL.classList.remove("selected")
+        sReplica.classList.remove("selected")
 
         sDeepL.classList.add("selected")
     }
@@ -255,6 +273,9 @@ twpConfig.onReady(function () {
             break
         case "google":
             sGoogle.classList.add("selected")
+            break
+        case "replica":
+            sReplica.classList.add("selected")
             break
         default:
             sGoogle.classList.add("selected")

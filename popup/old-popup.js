@@ -34,12 +34,9 @@ twpConfig.onReady(function () {
     const btnOptionsDiv = document.getElementById("btnOptionsDiv")
     const btnOptions = document.getElementById("btnOptions")
 
-    const divDonate = document.getElementById("divDonate")
     const msgHelpDevelopment = document.getElementById("msgHelpDevelopment")
-    const btnDonateWithPaypal = document.getElementById("btnDonateWithPaypal")
 
     $("#btnOptionB").innerHTML += ' <i class="arrow down"></i>'
-    $("#btnOptions option[value='donate']").innerHTML += " &#10084;";
 
     var cStyle = getComputedStyle(document.querySelector("#btnOptionB"))
     btnOptions.style.width = (parseInt(cStyle.width) + 0) + "px"
@@ -201,7 +198,12 @@ twpConfig.onReady(function () {
         if (currentPageTranslatorService == "yandex") {
             $("#btnOptions option[value='translateInExternalSite']").textContent = chrome.i18n.getMessage("msgOpenOnYandexTranslator")
             $("#iconTranslate").setAttribute("src", "/icons/yandex-translate-32.png")
-        } else { // google
+        } 
+        else if (currentPageTranslatorService == "replica") {
+            $("#btnOptions option[value='translateInExternalSite']").textContent = chrome.i18n.getMessage("msgOpenOnReplicaTranslator")
+            $("#iconTranslate").setAttribute("src", "/icons/replica-32.png")
+        } 
+        else { // google
             $("#btnOptions option[value='translateInExternalSite']").textContent = chrome.i18n.getMessage("btnOpenOnGoogleTranslate")
             $("#iconTranslate").setAttribute("src", "/icons/google-translate-32.png")
         }
@@ -370,7 +372,11 @@ twpConfig.onReady(function () {
 
         if (currentPageTranslatorService === "google") {
             currentPageTranslatorService = "yandex"
-        } else {
+        } 
+        else if (currentPageTranslatorService === "yandex") {
+            currentPageTranslatorService = "replica"
+        } 
+        else {
             currentPageTranslatorService = "google"
         }
 
@@ -474,7 +480,13 @@ twpConfig.onReady(function () {
                             chrome.tabs.create({
                                 url: "https://translate.yandex.com/translate?url=" + encodeURIComponent(tabs[0].url)
                             })
-                        } else { // google
+                        } 
+                        else if (currentPageTranslatorService === "replica") {
+                            chrome.tabs.create({
+                                url: "about:blank"
+                            })
+                        }
+                        else { // google
                             chrome.tabs.create({
                                 url: `https://translate.google.${
                                 "zh-cn" == navigator.language.toLowerCase() ? "cn" : "com"
@@ -486,11 +498,6 @@ twpConfig.onReady(function () {
                 case "moreOptions":
                     chrome.tabs.create({
                         url: chrome.runtime.getURL("/options/options.html")
-                    })
-                    break
-                case "donate":
-                    chrome.tabs.create({
-                        url: chrome.runtime.getURL("/options/options.html#donation")
                     })
                     break
                 default:
